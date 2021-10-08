@@ -1,0 +1,48 @@
+{
+   "version": 3,
+   "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 19,
+      "patch": 0
+   },
+   "configurePresets": [
+      {
+         "name": "default",
+         "generator": "Unix Makefiles",
+         "binaryDir": "${sourceDir}/build/${presetName}",
+         "hidden": true,
+         "cacheVariables": {
+            "CMAKE_INSTALL_PREFIX": {
+               "type": "STRING",
+               "value": "~/.local"
+            }
+         }
+      },
+      {
+         "name": "relwithdebinfo",
+         "inherits": "default",
+         "hidden": true,
+         "cacheVariables": {
+            "CMAKE_BUILD_TYPE": {
+               "type": "STRING",
+               "value": "RelWithDebInfo"
+            }
+         }
+      },
+      {
+         "name": "release",
+         "inherits": "default",
+         "hidden": true,
+         "cacheVariables": {
+            "CMAKE_BUILD_TYPE": {
+               "type": "STRING",
+               "value": "Release"
+            }
+         }
+      },
+      {
+         "name": "linux-x86_64",
+         "inherits": "relwithdebinfo"
+      }
+   ]
+}
