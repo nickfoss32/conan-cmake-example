@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Global Variables ##
+## Environment ##
 REPO_ROOT=`git rev-parse --show-toplevel`
 
 ################################################################################
@@ -8,26 +8,19 @@ REPO_ROOT=`git rev-parse --show-toplevel`
 ################################################################################
 Help()
 {
-   echo "Project's build configuration script."
+   echo "Script for building leetcode solutions."
    echo
-   echo "Syntax: ./configure.sh [-v|-h]"
+   echo "Syntax: ./build.sh [-v|-h]"
    echo "Options:"
    echo "-v|--verbose Enables verbose output."
-   echo "-h|--help    Prints this usage."
+   echo "-h|--help	Prints this usage."
    echo
 }
 
-################################################################################
-# echo_cmd                                                                     #
-################################################################################
-echo_cmd()
-{
-   if [[ -v VERBOSE ]]; then printf '%s\n' "${*}"; "${@}"; else "${@}"; fi; echo
-}
 
 ################################################################################
 ################################################################################
-# Main Program                                                                 #
+# Main program                                                                 #
 ################################################################################
 ################################################################################
 
@@ -38,7 +31,7 @@ while [[ $# -gt 0 ]]; do
 
    case $key in
       -v|--verbose)
-         VERBOSE=1
+         set -x
          shift
          ;;
       -h|--help)
@@ -46,12 +39,10 @@ while [[ $# -gt 0 ]]; do
          shift
          exit
          ;;
-      *)
-         Help
+      *)    # unknown option
          shift
-         exit
          ;;
-      esac
+   esac
 done
 
 ## List of build targets to generate build environments for ##
@@ -59,11 +50,14 @@ declare -a targets=("linux-x86_64")
 
 for target in "${targets[@]}"; do
    ## Create build directories ##
-   echo_cmd mkdir -p $REPO_ROOT/build/$target
+   mkdir -p $REPO_ROOT/build/$target
 
    ## Fetch dependencies using Conan (skip target if we failed to fetch) ##
    if ! conan install -if $REPO_ROOT/build/$target .; then continue; fi
 
    ## Configure and generate build environment with CMake ##
-   cmake --preset=$target
+   cmake --preset=$target -S $REPO_ROOT -B $REPO_ROOT/build/$target
+
+   ## build ##
+   cmake --build $REPO_ROOT/build/$target -- VERBOSE=$VERBOSE
 done
